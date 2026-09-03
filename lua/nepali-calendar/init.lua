@@ -80,9 +80,16 @@ function M.calculate_age(dob)
   return calculator.calculate_age(dob)
 end
 
---- Open interactive date converter
-function M.open_converter()
-  ui.open_converter_dialog()
+--- Open interactive festival search
+function M.search()
+  ui.open_search_dialog()
+end
+
+--- Search festivals programmatically
+--- @param query string
+--- @return table[]
+function M.search_events(query)
+  return require("nepali-calendar.core.festivals").search_events(query)
 end
 
 return M

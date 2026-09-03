@@ -299,9 +299,9 @@ function M.render()
   add_hl("NepaliCalBorder", #lines, 0, -1)
 
   -- 8. Help / Navigation Footer
-  add_line(" [h/l] Month  [j/k] Day  [t] Today  [c] Convert")
+  add_line(" [h/l] Month  [j/k] Day  [/] Search  [c] Convert")
   add_hl("NepaliCalKey", #lines, 0, -1)
-  add_line(" [y] Copy BS  [yi] ISO   [Tab] Lang [q] Close")
+  add_line(" [y] Copy BS  [yi] ISO   [Tab] Lang  [q] Close")
   add_hl("NepaliCalKey", #lines, 0, -1)
 
   -- Write lines to buffer (unlock & lock)
@@ -530,6 +530,44 @@ function M.open_converter_dialog()
   end)
 end
 
+--- Search festivals and jump to selected date
+function M.open_search_dialog()
+  local festivals = require("nepali-calendar.core.festivals")
+  vim.ui.input({ prompt = "🔍 Search Nepali Festivals & Events: " }, function(query)
+    if not query or vim.trim(query) == "" then
+      return
+    end
+
+    local matches = festivals.search_events(query)
+    if #matches == 0 then
+      vim.notify("No festivals found matching: " .. query, vim.log.levels.WARN, { title = "Festival Search" })
+      return
+    end
+
+    local items = {}
+    for _, m in ipairs(matches) do
+      local hol_tag = m.is_holiday and " [सार्वजनिक बिदा / Holiday]" or ""
+      local tithi_tag = (m.tithi and m.tithi ~= "") and (" (" .. m.tithi .. ")") or ""
+      local label = string.format("%s: %s%s%s", m.date_key, m.festival, tithi_tag, hol_tag)
+      table.insert(items, { label = label, match = m })
+    end
+
+    vim.ui.select(items, {
+      prompt = string.format("Search Results for '%s' (%d found):", query, #items),
+      format_item = function(item)
+        return item.label
+      end,
+    }, function(choice)
+      if choice and choice.match then
+        M.current_year = choice.match.year
+        M.current_month = choice.match.month
+        M.selected_day = choice.match.day
+        M.render()
+      end
+    end)
+  end)
+end
+
 --- Show popup keymaps / help dialog
 function M.show_help()
   local help_text = [[
@@ -542,6 +580,7 @@ Nepali Calendar (नेपाली पात्रो) Shortcuts:
   j / Down          : Next Day (+1)
   k / Up            : Previous Day (-1)
   t                 : Jump to Today
+  / / s             : Search Festivals & Events (3200+)
   <Tab>             : Toggle Nepali / English
   y                 : Copy Full Date String
   yi                : Copy ISO Date (YYYY-MM-DD)
@@ -638,6 +677,7 @@ function M.open()
   map(km.toggle_lang, M.toggle_language)
   map(km.copy_date, M.copy_selected_date)
   map(km.copy_iso, M.copy_iso_date)
+  map(km.search, M.open_search_dialog)
   map(km.converter, M.open_converter_dialog)
   map(km.help, M.show_help)
 

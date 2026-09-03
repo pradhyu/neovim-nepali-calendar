@@ -19,5 +19,9 @@ vim.api.nvim_create_user_command("NepaliCalendarToday", function()
 end, { desc = "Show today's Nepali date" })
 
 vim.api.nvim_create_user_command("NepaliCalendarConvert", function()
-  require("nepali-calendar").open_converter()
+  require("nepali-calendar.ui").open_converter_dialog()
 end, { desc = "Open Nepali Date Converter / Age / Math tools" })
+
+vim.api.nvim_create_user_command("NepaliCalendarSearch", function()
+  require("nepali-calendar.ui").open_search_dialog()
+end, { desc = "Search Nepali Festivals & Events" })

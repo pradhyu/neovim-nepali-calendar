@@ -21,6 +21,7 @@ M.defaults = {
     toggle_lang = { "<Tab>" },
     copy_date = { "yy", "y" },
     copy_iso = { "yi" },
+    search = { "/", "s", "S" },
     converter = { "c", "C" },
     help = { "?" },
   },

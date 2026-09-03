@@ -35,4 +35,42 @@ function M.get_event(year, month, day)
   return nil
 end
 
+--- Search all festivals matching query string
+--- @param query string
+--- @return table[] List of { date_key: string, year: integer, month: integer, day: integer, festival: string, tithi: string, is_holiday: boolean }
+function M.search_events(query)
+  if not query or query == "" then
+    return {}
+  end
+
+  local q_lower = vim.trim(query):lower()
+  local results = {}
+
+  for key, ev in pairs(festivals_data.events) do
+    if ev.festival and ev.festival ~= "" then
+      local fest_lower = ev.festival:lower()
+      local tithi_lower = (ev.tithi or ""):lower()
+      if fest_lower:find(q_lower, 1, true) or tithi_lower:find(q_lower, 1, true) or key:find(q_lower, 1, true) then
+        local y, m, d = key:match("(%d%d%d%d)-(%d%d)-(%d%d)")
+        table.insert(results, {
+          date_key = key,
+          year = tonumber(y),
+          month = tonumber(m),
+          day = tonumber(d),
+          festival = ev.festival,
+          tithi = ev.tithi or "",
+          is_holiday = ev.is_holiday or false,
+        })
+      end
+    end
+  end
+
+  -- Sort chronologically
+  table.sort(results, function(a, b)
+    return a.date_key < b.date_key
+  end)
+
+  return results
+end
+
 return M

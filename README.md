@@ -106,6 +106,7 @@ Plug 'pradhyu/neovim-nepali-calendar'
 | `j` / `<Down>` | Next Day (+1) |
 | `k` / `<Up>` | Previous Day (-1) |
 | `t` | Jump to Today |
+| `/` / `s` | **Search Festivals & Events (3,200+)** |
 | `<Tab>` | Toggle Language (`नेपाली` ↔ `English`) |
 | `y` | Copy Full Nepali Date String to clipboard |
 | `yi` | Copy ISO Date (`YYYY-MM-DD`) to clipboard |
@@ -120,6 +121,7 @@ Plug 'pradhyu/neovim-nepali-calendar'
 - `:NepaliCalendar` — Open Nepali Calendar popup.
 - `:NepaliCalendarToggle` — Toggle popup open / close.
 - `:NepaliCalendarToday` — Show today's Nepali date via notification.
+- `:NepaliCalendarSearch` — Search Nepali festivals & events (3,200+ entries) and jump to date.
 - `:NepaliCalendarConvert` — Open interactive date conversion & age calculation dialog.
 
 ---
