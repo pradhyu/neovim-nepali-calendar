@@ -379,9 +379,9 @@ function M.render()
   add_hl("NepaliCalBorder", #lines, 0, -1)
 
   -- 8. Help / Navigation Footer
-  add_line(" [h/l] Month  [j/k] Day   [v/V] Visual/Week  [/] Search")
+  add_line(" [h/l] Month  [j/k] Day  [v/V] Visual/Week  [/] Search  [u] Update")
   add_hl("NepaliCalKey", #lines, 0, -1)
-  add_line(" [u] Update   [y/yi] Copy [Tab] Lang         [q] Close")
+  add_line(" [y/yi] Copy  [Tab] English/नेपाली          [?] Help    [q] Close")
   add_hl("NepaliCalKey", #lines, 0, -1)
 
   -- Write lines to buffer (unlock & lock)
