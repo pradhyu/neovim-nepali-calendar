@@ -237,7 +237,7 @@ function M.render()
     end
 
     if config.options.show_english_subscript and d_info.ad then
-      day_str = string.format("%s %d", day_str, d_info.ad.day)
+      day_str = string.format("%s%s", day_str, localization.to_superscript(d_info.ad.day))
     end
 
     table.insert(current_row, center_str(day_str, col_width))
@@ -259,12 +259,12 @@ function M.render()
   if sel_info.is_holiday then
     full_date_str = full_date_str .. "  [सार्वजनिक बिदा / Holiday]"
   end
-  add_line(" 📅 " .. full_date_str)
+  add_line(" 🇳🇵 " .. full_date_str)
   add_hl("NepaliCalHeader", #lines, 0, -1)
 
   if sel_info.ad then
-    local month_abbr = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" }
-    local ad_str = string.format(" AD: %s %d, %d (%s)", month_abbr[sel_info.ad.month], sel_info.ad.day, sel_info.ad.year, localization.days_english_full[sel_info.wday])
+    local month_abbr = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" }
+    local ad_str = string.format(" 🌐 English (AD): %s %d, %d (%s)", month_abbr[sel_info.ad.month], sel_info.ad.day, sel_info.ad.year, localization.days_english_full[sel_info.wday])
     add_line(ad_str)
     add_hl("NepaliCalSubHeader", #lines, 0, -1)
   end

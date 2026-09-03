@@ -108,12 +108,35 @@ M.days_english_short = {
   "Sat",
 }
 
+M.superscript_digits = {
+  ["0"] = "⁰",
+  ["1"] = "¹",
+  ["2"] = "²",
+  ["3"] = "³",
+  ["4"] = "⁴",
+  ["5"] = "⁵",
+  ["6"] = "⁶",
+  ["7"] = "⁷",
+  ["8"] = "⁸",
+  ["9"] = "⁹",
+}
+
 function M.to_devanagari(val)
   local str = tostring(val)
   local res = ""
   for i = 1, #str do
     local char = str:sub(i, i)
     res = res .. (M.devanagari_digits[char] or char)
+  end
+  return res
+end
+
+function M.to_superscript(val)
+  local str = tostring(val)
+  local res = ""
+  for i = 1, #str do
+    local char = str:sub(i, i)
+    res = res .. (M.superscript_digits[char] or char)
   end
   return res
 end
