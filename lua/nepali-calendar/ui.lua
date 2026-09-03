@@ -757,7 +757,16 @@ function M.open_search_dialog()
         M.current_year = choice.match.year
         M.current_month = choice.match.month
         M.selected_day = choice.match.day
-        M.render()
+        M.visual_range_start = nil
+        M.visual_range_end = nil
+
+        -- If popup is not currently open, open it
+        if not M.win or not vim.api.nvim_win_is_valid(M.win) then
+          M.open()
+        else
+          M.render()
+          pcall(vim.api.nvim_set_current_win, M.win)
+        end
       end
     end)
   end)
