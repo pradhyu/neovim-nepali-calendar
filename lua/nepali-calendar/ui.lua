@@ -64,7 +64,9 @@ function M.render()
     table.insert(highlights, { group = group, line = line_idx - 1, col_start = col_start, col_end = col_end })
   end
 
-  local total_inner_width = 46
+  local total_inner_width = 56
+  local col_width = 8
+  local left_indent = ""
 
   -- 1. Live Nepal Clock Banner
   if config.options.show_nepal_clock then
@@ -141,9 +143,7 @@ function M.render()
   add_hl("NepaliCalBorder", #lines, 0, -1)
 
   -- 5. Weekday Headers (Sun to Sat)
-  -- 7 columns, each width 6 = 42 chars + left padding 2 = 44
-  local col_width = 6
-  local left_indent = "  "
+  -- 7 columns, each width 8 = 56 chars
   local wday_headers = {}
   for i = 1, 7 do
     local name = (lang == "nepali") and localization.days_nepali_short[i] or localization.days_english_short[i]
@@ -234,6 +234,10 @@ function M.render()
     local d_info = converter.date_info(M.current_year, M.current_month, d)
     if d_info.is_holiday then
       day_str = day_str .. "*"
+    end
+
+    if config.options.show_english_subscript and d_info.ad then
+      day_str = string.format("%s %d", day_str, d_info.ad.day)
     end
 
     table.insert(current_row, center_str(day_str, col_width))
@@ -571,7 +575,7 @@ function M.open()
   vim.bo[M.buf].filetype = "nepali_calendar"
 
   -- Calculate floating window dimensions
-  local width = 48
+  local width = 58
   local height = 24
   local screen_w = vim.o.columns
   local screen_h = vim.o.lines

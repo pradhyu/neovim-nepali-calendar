@@ -16,6 +16,7 @@ function M.setup_highlights()
     NepaliCalKey = { link = "SpecialKey", default = true },
     NepaliCalOpen = { link = "DiagnosticOk", default = true },
     NepaliCalClosed = { link = "DiagnosticWarn", default = true },
+    NepaliCalEnglishSub = { link = "Comment", default = true },
     NepaliCalProgressBar = { link = "String", default = true },
     NepaliCalProgressFill = { link = "Function", bold = true, default = true },
   }

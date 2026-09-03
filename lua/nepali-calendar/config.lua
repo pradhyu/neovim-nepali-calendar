@@ -6,6 +6,7 @@ M.defaults = {
   show_panchanga = true,
   show_nepal_clock = true,
   show_ad_date = true,
+  show_english_subscript = true,
   show_long_weekends = false,
   show_month_progress = false,
   keymaps = {
