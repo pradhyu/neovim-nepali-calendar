@@ -728,12 +728,17 @@ function M.open_search_dialog()
 
       local fest_text = (lang == "nepali") and m.festival or localization.translate_festival(m.festival)
 
+      local ad_info = converter.bs_to_ad(m.year, m.month, m.day)
+      local month_abbr = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" }
+      local ad_str = ad_info and string.format("(%s %d, %d)", month_abbr[ad_info.month], ad_info.day, ad_info.year) or ""
+
       local date_label
       if lang == "nepali" then
-        date_label = string.format("%s-%s-%s", localization.to_devanagari(m.year), localization.to_devanagari(m.month), localization.to_devanagari(m.day))
+        local m_np = localization.months_nepali[m.month] or tostring(m.month)
+        date_label = string.format("%s %s %s %s", localization.to_devanagari(m.day), m_np, localization.to_devanagari(m.year), ad_str)
       else
         local m_en = localization.months_english[m.month] or tostring(m.month)
-        date_label = string.format("%d %s %d", m.day, m_en, m.year)
+        date_label = string.format("%d %s %d %s", m.day, m_en, m.year, ad_str)
       end
 
       local label = string.format("%s: %s%s%s", date_label, fest_text, tithi_tag, hol_tag)
