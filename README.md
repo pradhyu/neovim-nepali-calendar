@@ -71,6 +71,13 @@ Designed following the specifications of [mac-nepali-calendar](https://github.co
     show_long_weekends = false,
     show_month_progress = false,
   },
+  keys = {
+    { "<leader>nc", "<cmd>NepaliCalendarToggle<cr>", desc = "Nepali Calendar (Toggle)" },
+    { "<leader>nt", "<cmd>NepaliCalendarToday<cr>", desc = "Today's Nepali Date" },
+    { "<leader>nu", "<cmd>NepaliCalendarUpdate<cr>", desc = "Update Festivals & Events" },
+    { "<leader>ns", "<cmd>NepaliCalendarSearch<cr>", desc = "Search Festivals" },
+    { "<leader>nd", "<cmd>NepaliCalendarConvert<cr>", desc = "Date Converter Tools" },
+  },
 }
 ```
 
