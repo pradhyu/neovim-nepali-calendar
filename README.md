@@ -105,14 +105,15 @@ Plug 'pradhyu/neovim-nepali-calendar'
 | `L` / `}` | Next Year (+1) |
 | `j` / `<Down>` | Next Day (+1) |
 | `k` / `<Up>` | Previous Day (-1) |
+| `v` / `V` | **Visual Range Mode** (Highlight multiple days & display all events in range) |
 | `t` | Jump to Today |
 | `/` / `s` | **Search Festivals & Events (3,200+)** |
 | `<Tab>` | Toggle Language (`नेपाली` ↔ `English`) |
-| `y` | Copy Full Nepali Date String to clipboard |
-| `yi` | Copy ISO Date (`YYYY-MM-DD`) to clipboard |
+| `y` | Copy Selected Date or Range to clipboard |
+| `yi` | Copy ISO Date or Range (`YYYY-MM-DD`) to clipboard |
 | `c` | Open Converter / Age / Date Math Menu |
 | `?` | Show Help Dialog |
-| `q` / `<Esc>` | Close Calendar Popup |
+| `q` / `<Esc>` | Close Calendar Popup / Exit Visual Mode |
 
 ---
 

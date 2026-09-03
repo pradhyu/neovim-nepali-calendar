@@ -15,6 +15,8 @@ M.current_month = nil
 M.selected_day = nil
 M.today = nil
 M.language = nil
+M.visual_range_start = nil
+M.visual_range_end = nil
 
 -- Cell positions on screen: map of day -> { line: integer, col_start: integer, col_end: integer }
 M.day_cell_map = {}
@@ -203,10 +205,21 @@ function M.render()
           }
 
           local is_today = (M.current_year == M.today.year and M.current_month == M.today.month and day_num == M.today.day)
-          local is_selected = (day_num == M.selected_day)
+          local in_range = false
+          if M.visual_range_start and M.visual_range_end then
+            local r_min = math.min(M.visual_range_start, M.visual_range_end)
+            local r_max = math.max(M.visual_range_start, M.visual_range_end)
+            if day_num >= r_min and day_num <= r_max then
+              in_range = true
+            end
+          end
+
+          local is_selected = (day_num == M.selected_day) or in_range
           local d_info = converter.date_info(M.current_year, M.current_month, day_num)
 
-          if is_selected then
+          if in_range then
+            add_hl("NepaliCalSelected", r_line_idx, cspan.b_start, cspan.b_end)
+          elseif is_selected then
             add_hl("NepaliCalSelected", r_line_idx, cspan.b_start, cspan.b_end)
           elseif is_today then
             add_hl("NepaliCalToday", r_line_idx, cspan.b_start, cspan.b_end)
@@ -218,8 +231,8 @@ function M.render()
             add_hl("NepaliCalDay", r_line_idx, cspan.b_start, cspan.b_end)
           end
 
-          -- If not selected/today/holiday, highlight the secondary English "(day)" in subtle comment tone
-          if not is_selected and not is_today and not d_info.is_holiday and cspan.col_i ~= 7 then
+          -- If not selected/today/holiday/range, highlight the secondary English "(day)" in subtle comment tone
+          if not is_selected and not is_today and not d_info.is_holiday and cspan.col_i ~= 7 and not in_range then
             local cell_text = current_row_cells[cspan.col_i] or ""
             local paren_pos = cell_text:find("%(")
             if paren_pos then
@@ -272,44 +285,94 @@ function M.render()
   add_line(string.rep("─", total_inner_width))
   add_hl("NepaliCalBorder", #lines, 0, -1)
 
-  -- 7. Selected Date Details Card
-  local sel_info = converter.date_info(M.current_year, M.current_month, M.selected_day)
-  local full_date_str = format.format_full(sel_info, lang)
-  if sel_info.is_holiday then
-    full_date_str = full_date_str .. "  [सार्वजनिक बिदा / Holiday]"
-  end
-  add_line(" 🇳🇵 " .. full_date_str)
-  add_hl("NepaliCalHeader", #lines, 0, -1)
+  -- 7. Selected Date / Visual Range Details Card
+  if M.visual_range_start and M.visual_range_end then
+    local r_min = math.min(M.visual_range_start, M.visual_range_end)
+    local r_max = math.max(M.visual_range_start, M.visual_range_end)
 
-  if sel_info.ad then
-    local month_names = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" }
-    local ad_str = string.format(" 🌐 English (AD): %s %d, %d (%s)", month_names[sel_info.ad.month], sel_info.ad.day, sel_info.ad.year, localization.days_english_full[sel_info.wday])
-    add_line(ad_str)
-    add_hl("NepaliCalEnglishDate", #lines, 0, -1)
-  end
+    local start_info = converter.date_info(M.current_year, M.current_month, r_min)
+    local end_info = converter.date_info(M.current_year, M.current_month, r_max)
 
-  if sel_info.festival and sel_info.festival ~= "" then
-    add_line(" ✨ " .. sel_info.festival)
-    add_hl("NepaliCalFestival", #lines, 0, -1)
-  end
+    local m_name = (lang == "nepali") and localization.months_nepali[M.current_month] or localization.months_english[M.current_month]
+    local y_str = (lang == "nepali") and localization.to_devanagari(M.current_year) or tostring(M.current_year)
+    local start_d_str = (lang == "nepali") and localization.to_devanagari(r_min) or tostring(r_min)
+    local end_d_str = (lang == "nepali") and localization.to_devanagari(r_max) or tostring(r_max)
 
-  -- Panchanga Information
-  if config.options.show_panchanga then
-    local pan = panchanga.calculate(sel_info)
-    local pan_line1 = string.format(" 🌅 %s   🌇 %s   ⌛ %s", pan.sunrise, pan.sunset, pan.day_length)
-    add_line(pan_line1)
-    add_hl("NepaliCalPanchanga", #lines, 0, -1)
+    local range_title = string.format(" 🗓️  Range: %s – %s %s %s (%d days selected)", start_d_str, end_d_str, m_name, y_str, (r_max - r_min + 1))
+    add_line(range_title)
+    add_hl("NepaliCalHeader", #lines, 0, -1)
 
-    local pan_line2 = string.format(" ☀️ राशि: %s   ⏱ राहु काल: %s", pan.sun_rashi, pan.rahu_kaal)
-    add_line(pan_line2)
-    add_hl("NepaliCalPanchanga", #lines, 0, -1)
+    if start_info.ad and end_info.ad then
+      local month_names = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" }
+      local ad_range_str = string.format(" 🌐 AD: %s %d – %s %d, %d", month_names[start_info.ad.month], start_info.ad.day, month_names[end_info.ad.month], end_info.ad.day, end_info.ad.year)
+      add_line(ad_range_str)
+      add_hl("NepaliCalEnglishDate", #lines, 0, -1)
+    end
+
+    add_line(" 📋 Events in Range:")
+    add_hl("NepaliCalSubHeader", #lines, 0, -1)
+
+    local range_events_found = 0
+    for day_i = r_min, r_max do
+      local day_ev = converter.date_info(M.current_year, M.current_month, day_i)
+      if (day_ev.festival and day_ev.festival ~= "") or day_ev.is_holiday or (day_ev.tithi and day_ev.tithi ~= "") then
+        local d_label = (lang == "nepali") and localization.to_devanagari(day_i) or tostring(day_i)
+        local w_label = (lang == "nepali") and localization.days_nepali_short[day_ev.wday] or localization.days_english_short[day_ev.wday]
+        local hol_tag = day_ev.is_holiday and " [सार्वजनिक बिदा / Holiday]" or ""
+        local tithi_tag = (day_ev.tithi and day_ev.tithi ~= "") and (" (" .. day_ev.tithi .. ")") or ""
+        local fest_tag = (day_ev.festival and day_ev.festival ~= "") and (" - " .. day_ev.festival) or ""
+
+        local ev_line = string.format("   • %s %s%s%s%s", d_label, w_label, tithi_tag, fest_tag, hol_tag)
+        add_line(ev_line)
+        local ev_hl = day_ev.is_holiday and "NepaliCalHoliday" or "NepaliCalFestival"
+        add_hl(ev_hl, #lines, 0, -1)
+        range_events_found = range_events_found + 1
+      end
+    end
+
+    if range_events_found == 0 then
+      add_line("   (No special festivals or public holidays in this date range)")
+      add_hl("NepaliCalKey", #lines, 0, -1)
+    end
+  else
+    local sel_info = converter.date_info(M.current_year, M.current_month, M.selected_day)
+    local full_date_str = format.format_full(sel_info, lang)
+    if sel_info.is_holiday then
+      full_date_str = full_date_str .. "  [सार्वजनिक बिदा / Holiday]"
+    end
+    add_line(" 🇳🇵 " .. full_date_str)
+    add_hl("NepaliCalHeader", #lines, 0, -1)
+
+    if sel_info.ad then
+      local month_names = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" }
+      local ad_str = string.format(" 🌐 English (AD): %s %d, %d (%s)", month_names[sel_info.ad.month], sel_info.ad.day, sel_info.ad.year, localization.days_english_full[sel_info.wday])
+      add_line(ad_str)
+      add_hl("NepaliCalEnglishDate", #lines, 0, -1)
+    end
+
+    if sel_info.festival and sel_info.festival ~= "" then
+      add_line(" ✨ " .. sel_info.festival)
+      add_hl("NepaliCalFestival", #lines, 0, -1)
+    end
+
+    -- Panchanga Information
+    if config.options.show_panchanga then
+      local pan = panchanga.calculate(sel_info)
+      local pan_line1 = string.format(" 🌅 %s   🌇 %s   ⌛ %s", pan.sunrise, pan.sunset, pan.day_length)
+      add_line(pan_line1)
+      add_hl("NepaliCalPanchanga", #lines, 0, -1)
+
+      local pan_line2 = string.format(" ☀️ राशि: %s   ⏱ राहु काल: %s", pan.sun_rashi, pan.rahu_kaal)
+      add_line(pan_line2)
+      add_hl("NepaliCalPanchanga", #lines, 0, -1)
+    end
   end
 
   add_line(string.rep("─", total_inner_width))
   add_hl("NepaliCalBorder", #lines, 0, -1)
 
   -- 8. Help / Navigation Footer
-  add_line(" [h/l] Month  [j/k] Day  [/] Search  [c] Convert")
+  add_line(" [h/l] Month  [j/k] Day  [v] Visual  [/] Search")
   add_hl("NepaliCalKey", #lines, 0, -1)
   add_line(" [y] Copy BS  [yi] ISO   [Tab] Lang  [q] Close")
   add_hl("NepaliCalKey", #lines, 0, -1)
@@ -387,6 +450,33 @@ function M.change_year(delta)
   M.render()
 end
 
+--- Toggle visual range selection mode
+function M.toggle_visual_mode()
+  if M.visual_range_start then
+    -- Exit visual mode
+    M.visual_range_start = nil
+    M.visual_range_end = nil
+    vim.notify("Exited Visual Selection Mode", vim.log.levels.INFO, { title = "Nepali Calendar" })
+  else
+    -- Enter visual mode starting at current day
+    M.visual_range_start = M.selected_day
+    M.visual_range_end = M.selected_day
+    vim.notify("Entered Visual Mode: use h/l/j/k to select day range (press v or Esc to exit)", vim.log.levels.INFO, { title = "Nepali Calendar" })
+  end
+  M.render()
+end
+
+--- Clear visual selection mode
+function M.clear_visual_mode()
+  if M.visual_range_start or M.visual_range_end then
+    M.visual_range_start = nil
+    M.visual_range_end = nil
+    M.render()
+    return true
+  end
+  return false
+end
+
 --- Move day by delta (+1, -1, +7, -7)
 function M.change_day(delta)
   local max_days = converter.days_in_month(M.current_year, M.current_month)
@@ -396,18 +486,31 @@ function M.change_day(delta)
     M.change_month(-1)
     local prev_max = converter.days_in_month(M.current_year, M.current_month)
     M.selected_day = math.max(1, prev_max + new_day)
+    if M.visual_range_start then
+      M.visual_range_start = M.selected_day
+      M.visual_range_end = M.selected_day
+    end
   elseif new_day > max_days then
     local overflow = new_day - max_days
     M.change_month(1)
     M.selected_day = math.min(overflow, converter.days_in_month(M.current_year, M.current_month))
+    if M.visual_range_start then
+      M.visual_range_start = M.selected_day
+      M.visual_range_end = M.selected_day
+    end
   else
     M.selected_day = new_day
+    if M.visual_range_start then
+      M.visual_range_end = new_day
+    end
   end
   M.render()
 end
 
 --- Go to today
 function M.goto_today()
+  M.visual_range_start = nil
+  M.visual_range_end = nil
   M.today = converter.today()
   M.current_year = M.today.year
   M.current_month = M.today.month
@@ -421,22 +524,54 @@ function M.toggle_language()
   M.render()
 end
 
---- Copy selected date to clipboard in full Nepali or English format
+--- Copy selected date or date range to clipboard
 function M.copy_selected_date()
-  local info = converter.date_info(M.current_year, M.current_month, M.selected_day)
-  local str = format.format_full(info, M.language)
-  vim.fn.setreg("+", str)
-  vim.fn.setreg('"', str)
-  vim.notify("Copied to clipboard: " .. str, vim.log.levels.INFO, { title = "Nepali Calendar" })
+  if M.visual_range_start and M.visual_range_end then
+    local r_min = math.min(M.visual_range_start, M.visual_range_end)
+    local r_max = math.max(M.visual_range_start, M.visual_range_end)
+    local start_info = converter.date_info(M.current_year, M.current_month, r_min)
+    local end_info = converter.date_info(M.current_year, M.current_month, r_max)
+
+    local lines_to_copy = {}
+    table.insert(lines_to_copy, string.format("Nepali Date Range: %s to %s", format.format_full(start_info, M.language), format.format_full(end_info, M.language)))
+    for day_i = r_min, r_max do
+      local day_ev = converter.date_info(M.current_year, M.current_month, day_i)
+      if (day_ev.festival and day_ev.festival ~= "") or day_ev.is_holiday then
+        local hol_tag = day_ev.is_holiday and " [Holiday]" or ""
+        table.insert(lines_to_copy, string.format("• %s: %s%s", format.format_short(day_ev, M.language), day_ev.festival, hol_tag))
+      end
+    end
+    local str = table.concat(lines_to_copy, "\n")
+    vim.fn.setreg("+", str)
+    vim.fn.setreg('"', str)
+    vim.notify("Copied date range and events to clipboard!", vim.log.levels.INFO, { title = "Nepali Calendar" })
+  else
+    local info = converter.date_info(M.current_year, M.current_month, M.selected_day)
+    local str = format.format_full(info, M.language)
+    vim.fn.setreg("+", str)
+    vim.fn.setreg('"', str)
+    vim.notify("Copied to clipboard: " .. str, vim.log.levels.INFO, { title = "Nepali Calendar" })
+  end
 end
 
---- Copy selected date to clipboard in ISO format (YYYY-MM-DD)
+--- Copy selected date or date range in ISO format (YYYY-MM-DD)
 function M.copy_iso_date()
-  local info = converter.date_info(M.current_year, M.current_month, M.selected_day)
-  local str = format.format_iso(info)
-  vim.fn.setreg("+", str)
-  vim.fn.setreg('"', str)
-  vim.notify("Copied to clipboard: " .. str, vim.log.levels.INFO, { title = "Nepali Calendar" })
+  if M.visual_range_start and M.visual_range_end then
+    local r_min = math.min(M.visual_range_start, M.visual_range_end)
+    local r_max = math.max(M.visual_range_start, M.visual_range_end)
+    local start_info = converter.date_info(M.current_year, M.current_month, r_min)
+    local end_info = converter.date_info(M.current_year, M.current_month, r_max)
+    local str = string.format("%s to %s", format.format_iso(start_info), format.format_iso(end_info))
+    vim.fn.setreg("+", str)
+    vim.fn.setreg('"', str)
+    vim.notify("Copied ISO date range to clipboard: " .. str, vim.log.levels.INFO, { title = "Nepali Calendar" })
+  else
+    local info = converter.date_info(M.current_year, M.current_month, M.selected_day)
+    local str = format.format_iso(info)
+    vim.fn.setreg("+", str)
+    vim.fn.setreg('"', str)
+    vim.notify("Copied to clipboard: " .. str, vim.log.levels.INFO, { title = "Nepali Calendar" })
+  end
 end
 
 --- Open interactive date converter prompt
@@ -589,14 +724,15 @@ Nepali Calendar (नेपाली पात्रो) Shortcuts:
   } / L             : Next Year
   j / Down          : Next Day (+1)
   k / Up            : Previous Day (-1)
+  v                 : Toggle Visual Selection Range (Show all events)
   t                 : Jump to Today
   / / s             : Search Festivals & Events (3200+)
   <Tab>             : Toggle Nepali / English
-  y                 : Copy Full Date String
-  yi                : Copy ISO Date (YYYY-MM-DD)
+  y                 : Copy Selected Date / Range
+  yi                : Copy ISO Date / Range (YYYY-MM-DD)
   c                 : Date Tools (AD<->BS, Age, Math)
   ?                 : Show This Help
-  q / <Esc>         : Close Calendar Popup
+  q / <Esc>         : Close / Exit Visual Mode
 ]]
   vim.notify(help_text, vim.log.levels.INFO, { title = "Nepali Calendar Help" })
 end
@@ -664,7 +800,12 @@ function M.open()
   end
 
   local km = config.options.keymaps
-  map(km.close, M.close)
+  map(km.close, function()
+    if not M.clear_visual_mode() then
+      M.close()
+    end
+  end)
+  map(km.visual_mode, M.toggle_visual_mode)
   map(km.next_month, function()
     M.change_month(1)
   end)
