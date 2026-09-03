@@ -64,8 +64,8 @@ function M.render()
     table.insert(highlights, { group = group, line = line_idx - 1, col_start = col_start, col_end = col_end })
   end
 
-  local total_inner_width = 56
-  local col_width = 8
+  local total_inner_width = 63
+  local col_width = 9
   local left_indent = ""
 
   -- 1. Live Nepal Clock Banner
@@ -246,7 +246,7 @@ function M.render()
     end
 
     if config.options.show_english_subscript and d_info.ad then
-      day_str = string.format("%s%s", day_str, localization.to_superscript(d_info.ad.day))
+      day_str = string.format("%s · %d", day_str, d_info.ad.day)
     end
 
     table.insert(current_row_cells, center_str(day_str, col_width))
@@ -584,7 +584,7 @@ function M.open()
   vim.bo[M.buf].filetype = "nepali_calendar"
 
   -- Calculate floating window dimensions
-  local width = 58
+  local width = 65
   local height = 24
   local screen_w = vim.o.columns
   local screen_h = vim.o.lines
