@@ -217,6 +217,16 @@ function M.render()
           else
             add_hl("NepaliCalDay", r_line_idx, cspan.b_start, cspan.b_end)
           end
+
+          -- If not selected/today/holiday, highlight the secondary English "(day)" in subtle comment tone
+          if not is_selected and not is_today and not d_info.is_holiday and cspan.col_i ~= 7 then
+            local cell_text = current_row_cells[cspan.col_i] or ""
+            local paren_pos = cell_text:find("%(")
+            if paren_pos then
+              local paren_byte_start = cspan.b_start + (paren_pos - 1)
+              add_hl("NepaliCalEnglishSub", r_line_idx, paren_byte_start, cspan.b_end)
+            end
+          end
         end
       end
 
