@@ -756,19 +756,11 @@ function M.open_search_dialog()
       end,
     }, function(choice)
       if choice and choice.match then
-        M.current_year = choice.match.year
-        M.current_month = choice.match.month
-        M.selected_day = choice.match.day
-        M.visual_range_start = nil
-        M.visual_range_end = nil
-
-        -- If popup is not currently open, open it
-        if not M.win or not vim.api.nvim_win_is_valid(M.win) then
-          M.open()
-        else
-          M.render()
-          pcall(vim.api.nvim_set_current_win, M.win)
-        end
+        M.open({
+          year = choice.match.year,
+          month = choice.match.month,
+          day = choice.match.day,
+        })
       end
     end)
   end)
@@ -815,19 +807,37 @@ function M.close()
 end
 
 --- Toggle or open popup window
-function M.open()
+--- @param target_opts table|nil { year: integer, month: integer, day: integer }
+function M.open(target_opts)
   if M.win and vim.api.nvim_win_is_valid(M.win) then
-    M.close()
-    return
+    if not target_opts then
+      M.close()
+      return
+    end
   end
 
   require("nepali-calendar.highlights").setup_highlights()
 
   M.today = converter.today()
-  M.current_year = M.today.year
-  M.current_month = M.today.month
-  M.selected_day = M.today.day
+  if target_opts and target_opts.year then
+    M.current_year = target_opts.year
+    M.current_month = target_opts.month or 1
+    M.selected_day = target_opts.day or 1
+  else
+    M.current_year = M.today.year
+    M.current_month = M.today.month
+    M.selected_day = M.today.day
+  end
+  M.visual_range_start = nil
+  M.visual_range_end = nil
   M.language = config.options.language
+
+  -- If window is already open, just re-render and focus
+  if M.win and vim.api.nvim_win_is_valid(M.win) then
+    M.render()
+    pcall(vim.api.nvim_set_current_win, M.win)
+    return
+  end
 
   -- Create scratch buffer
   M.buf = vim.api.nvim_create_buf(false, true)
