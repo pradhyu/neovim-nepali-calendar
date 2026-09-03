@@ -705,7 +705,10 @@ end
 --- Search festivals and jump to selected date
 function M.open_search_dialog()
   local festivals = require("nepali-calendar.core.festivals")
-  vim.ui.input({ prompt = "🔍 Search Nepali Festivals & Events: " }, function(query)
+  local lang = M.language or config.options.language
+
+  local input_prompt = (lang == "nepali") and "🔍 Search Nepali Festivals & Events (नेपाली चाडपर्व): " or "🔍 Search Nepali Festivals & Events: "
+  vim.ui.input({ prompt = input_prompt }, function(query)
     if not query or vim.trim(query) == "" then
       return
     end
@@ -718,14 +721,29 @@ function M.open_search_dialog()
 
     local items = {}
     for _, m in ipairs(matches) do
-      local hol_tag = m.is_holiday and " [सार्वजनिक बिदा / Holiday]" or ""
-      local tithi_tag = (m.tithi and m.tithi ~= "") and (" (" .. m.tithi .. ")") or ""
-      local label = string.format("%s: %s%s%s", m.date_key, m.festival, tithi_tag, hol_tag)
+      local hol_tag = m.is_holiday and ((lang == "nepali") and " [सार्वजनिक बिदा]" or " [Public Holiday]") or ""
+
+      local tithi_text = (lang == "nepali") and m.tithi or localization.translate_tithi(m.tithi)
+      local tithi_tag = (tithi_text and tithi_text ~= "") and (" (" .. tithi_text .. ")") or ""
+
+      local fest_text = (lang == "nepali") and m.festival or localization.translate_festival(m.festival)
+
+      local date_label
+      if lang == "nepali" then
+        date_label = string.format("%s-%s-%s", localization.to_devanagari(m.year), localization.to_devanagari(m.month), localization.to_devanagari(m.day))
+      else
+        local m_en = localization.months_english[m.month] or tostring(m.month)
+        date_label = string.format("%d %s %d", m.day, m_en, m.year)
+      end
+
+      local label = string.format("%s: %s%s%s", date_label, fest_text, tithi_tag, hol_tag)
       table.insert(items, { label = label, match = m })
     end
 
+    local select_prompt = (lang == "nepali") and string.format("खोज नतिजा '%s' (%d भेटियो):", query, #items) or string.format("Search Results for '%s' (%d found):", query, #items)
+
     vim.ui.select(items, {
-      prompt = string.format("Search Results for '%s' (%d found):", query, #items),
+      prompt = select_prompt,
       format_item = function(item)
         return item.label
       end,
