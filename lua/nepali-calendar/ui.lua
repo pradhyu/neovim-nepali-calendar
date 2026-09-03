@@ -379,9 +379,11 @@ function M.render()
   add_hl("NepaliCalBorder", #lines, 0, -1)
 
   -- 8. Help / Navigation Footer
-  add_line(" [h/l] Month  [j/k] Day  [v/V] Visual/Week  [/] Search  [u] Update")
+  add_line(" 🧭 Nav:    [h/l] Month   [j/k] Day   [v/V] Visual/Week   [t] Today")
   add_hl("NepaliCalKey", #lines, 0, -1)
-  add_line(" [y/yi] Copy  [Tab] English/नेपाली          [?] Help    [q] Close")
+  add_line(" 🎪 Events: [/] Search Festivals    [u] Update Latest Events")
+  add_hl("NepaliCalKey", #lines, 0, -1)
+  add_line(" ⚙️  Tools:  [y/yi] Copy Date      [Tab] English/नेपाली    [q] Close")
   add_hl("NepaliCalKey", #lines, 0, -1)
 
   -- Write lines to buffer (unlock & lock)
@@ -777,18 +779,23 @@ function M.show_help()
   local help_text = [[
 Nepali Calendar (नेपाली पात्रो) Shortcuts:
 ─────────────────────────────────────────────
-  h / [ / Left      : Previous Month
-  l / ] / Right     : Next Month
-  { / H             : Previous Year
-  } / L             : Next Year
+🧭 NAVIGATION:
+  h / [ / Left      : Previous Month (-1)
+  l / ] / Right     : Next Month (+1)
+  { / H             : Previous Year (-1)
+  } / L             : Next Year (+1)
   j / Down          : Next Day (+1)
   k / Up            : Previous Day (-1)
-  v                 : Toggle Visual Selection Range (Show all events)
-  V (Shift-V)       : Select Entire Week (Sun–Sat) & Show Events
   t                 : Jump to Today
-  u                 : Update Festivals & Events (Fetch latest)
-  / / s             : Search Festivals & Events (3200+)
-  <Tab>             : Toggle Nepali / English
+  v                 : Custom Day Range Selection (Visual Mode)
+  V (Shift-V)       : Select Entire Week (Sun–Sat)
+
+🎪 FESTIVALS & EVENTS:
+  / / s             : Search Festivals & Events (3,200+ entries)
+  u                 : Fetch & Update Latest Events from Remote
+
+⚙️ TOOLS & CLIPBOARD:
+  <Tab>             : Toggle Language (नेपाली ↔ English)
   y                 : Copy Selected Date / Range
   yi                : Copy ISO Date / Range (YYYY-MM-DD)
   c                 : Date Tools (AD<->BS, Age, Math)
