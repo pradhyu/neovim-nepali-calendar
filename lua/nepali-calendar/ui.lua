@@ -304,6 +304,14 @@ function M.render()
     vim.api.nvim_buf_add_highlight(M.buf, ns, hl.group, hl.line, hl.col_start, hl.col_end)
   end
 
+  -- Dynamically adjust window height to fit exact content
+  if M.win and vim.api.nvim_win_is_valid(M.win) then
+    local new_height = math.min(#lines, vim.o.lines - 4)
+    local screen_h = vim.o.lines
+    local new_row = math.max(1, math.floor((screen_h - new_height) / 2))
+    pcall(vim.api.nvim_win_set_config, M.win, { height = new_height, row = new_row })
+  end
+
   -- Position cursor on the selected day cell if possible
   if M.day_cell_map[M.selected_day] and M.win and vim.api.nvim_win_is_valid(M.win) then
     local cell = M.day_cell_map[M.selected_day]
