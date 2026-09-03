@@ -263,10 +263,10 @@ function M.render()
   add_hl("NepaliCalHeader", #lines, 0, -1)
 
   if sel_info.ad then
-    local month_abbr = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" }
-    local ad_str = string.format(" 🌐 English (AD): %s %d, %d (%s)", month_abbr[sel_info.ad.month], sel_info.ad.day, sel_info.ad.year, localization.days_english_full[sel_info.wday])
+    local month_names = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" }
+    local ad_str = string.format(" 🌐 English (AD): %s %d, %d (%s)", month_names[sel_info.ad.month], sel_info.ad.day, sel_info.ad.year, localization.days_english_full[sel_info.wday])
     add_line(ad_str)
-    add_hl("NepaliCalSubHeader", #lines, 0, -1)
+    add_hl("NepaliCalEnglishDate", #lines, 0, -1)
   end
 
   if sel_info.festival and sel_info.festival ~= "" then

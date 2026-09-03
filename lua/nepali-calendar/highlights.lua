@@ -1,24 +1,24 @@
 local M = {}
 
 function M.setup_highlights()
+  -- Theme-aware colors derived cleanly from standard groups or beautiful dark fallbacks
   local highlights = {
-    NepaliCalHeader = { link = "Title", default = true },
-    NepaliCalSubHeader = { link = "Comment", default = true },
-    NepaliCalWeekday = { link = "Keyword", default = true },
-    NepaliCalSaturday = { link = "DiagnosticError", default = true },
-    NepaliCalToday = { link = "CursorLineNr", bold = true, reverse = true, default = true },
-    NepaliCalSelected = { link = "Visual", bold = true, default = true },
-    NepaliCalHoliday = { link = "ErrorMsg", bold = true, default = true },
-    NepaliCalFestival = { link = "Special", default = true },
-    NepaliCalTithi = { link = "Identifier", default = true },
-    NepaliCalPanchanga = { link = "Function", default = true },
+    NepaliCalHeader = { link = "Title", bold = true, default = true },
+    NepaliCalSubHeader = { link = "Directory", default = true },
+    NepaliCalWeekday = { link = "Constant", bold = true, default = true },
+    NepaliCalSaturday = { link = "DiagnosticError", bold = true, default = true },
+    NepaliCalDay = { link = "Normal", default = true },
+    NepaliCalToday = { link = "IncSearch", bold = true, default = true },
+    NepaliCalSelected = { link = "Search", bold = true, default = true },
+    NepaliCalHoliday = { link = "DiagnosticWarn", bold = true, default = true },
+    NepaliCalFestival = { link = "DiagnosticOk", bold = true, default = true },
+    NepaliCalTithi = { link = "String", default = true },
+    NepaliCalEnglishDate = { link = "Special", bold = true, default = true },
+    NepaliCalPanchanga = { link = "Identifier", default = true },
     NepaliCalBorder = { link = "FloatBorder", default = true },
-    NepaliCalKey = { link = "SpecialKey", default = true },
-    NepaliCalOpen = { link = "DiagnosticOk", default = true },
-    NepaliCalClosed = { link = "DiagnosticWarn", default = true },
-    NepaliCalEnglishSub = { link = "Comment", default = true },
-    NepaliCalProgressBar = { link = "String", default = true },
-    NepaliCalProgressFill = { link = "Function", bold = true, default = true },
+    NepaliCalKey = { link = "Comment", default = true },
+    NepaliCalOpen = { link = "DiagnosticOk", bold = true, default = true },
+    NepaliCalClosed = { link = "DiagnosticError", bold = true, default = true },
   }
 
   for group, opts in pairs(highlights) do
