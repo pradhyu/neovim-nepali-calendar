@@ -64,8 +64,8 @@ function M.render()
     table.insert(highlights, { group = group, line = line_idx - 1, col_start = col_start, col_end = col_end })
   end
 
-  local total_inner_width = 63
-  local col_width = 9
+  local total_inner_width = 77
+  local col_width = 11
   local left_indent = ""
 
   -- 1. Live Nepal Clock Banner
@@ -623,7 +623,7 @@ function M.open()
   vim.bo[M.buf].filetype = "nepali_calendar"
 
   -- Calculate floating window dimensions
-  local width = 65
+  local width = 79
   local height = 24
   local screen_w = vim.o.columns
   local screen_h = vim.o.lines
