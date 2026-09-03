@@ -110,3 +110,4 @@ require("nepali-calendar").setup({
   show_month_progress = true, -- Visual month progress bar
 })
 ```
+# neovim-nepali-calendar
