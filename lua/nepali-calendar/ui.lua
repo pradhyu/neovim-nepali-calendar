@@ -143,23 +143,24 @@ function M.render()
   add_hl("NepaliCalBorder", #lines, 0, -1)
 
   -- 5. Weekday Headers (Sun to Sat)
-  -- 7 columns, each width 8 = 56 chars
-  local wday_headers = {}
+  local wday_line_idx = #lines + 1
+  local wday_line_buf = ""
+  local wday_cols = {}
+
   for i = 1, 7 do
     local name = (lang == "nepali") and localization.days_nepali_short[i] or localization.days_english_short[i]
-    table.insert(wday_headers, center_str(name, col_width))
+    local cell_str = center_str(name, col_width)
+    local b_start = #wday_line_buf
+    wday_line_buf = wday_line_buf .. cell_str
+    local b_end = #wday_line_buf
+    table.insert(wday_cols, { b_start = b_start, b_end = b_end, is_saturday = (i == 7) })
   end
-  local wday_line = left_indent .. table.concat(wday_headers, "")
-  add_line(wday_line)
-  local wday_line_idx = #lines
+  add_line(wday_line_buf)
 
-  -- Highlight Saturday differently
-  for i = 1, 6 do
-    local c_start = #left_indent + (i - 1) * col_width
-    add_hl("NepaliCalWeekday", wday_line_idx, c_start, c_start + col_width)
+  for _, wc in ipairs(wday_cols) do
+    local hl_group = wc.is_saturday and "NepaliCalSaturday" or "NepaliCalWeekday"
+    add_hl(hl_group, wday_line_idx, wc.b_start, wc.b_end)
   end
-  local sat_start = #left_indent + 6 * col_width
-  add_hl("NepaliCalSaturday", wday_line_idx, sat_start, sat_start + col_width)
 
   add_line(string.rep("┄", total_inner_width))
   add_hl("NepaliCalBorder", #lines, 0, -1)
@@ -170,55 +171,63 @@ function M.render()
   local offset = first_wday - 1 -- number of empty cells before 1st
 
   local cell_idx = 0
-  local current_row = {}
+  local current_row_cells = {}
   local row_days = {}
 
   local function flush_row()
-    if #current_row > 0 then
-      while #current_row < 7 do
-        table.insert(current_row, string.rep(" ", col_width))
+    if #current_row_cells > 0 then
+      while #current_row_cells < 7 do
+        table.insert(current_row_cells, string.rep(" ", col_width))
+        table.insert(row_days, false)
       end
-      local r_line = left_indent .. table.concat(current_row, "")
-      add_line(r_line)
-      local r_line_idx = #lines
 
-      for col_i, day_num in ipairs(row_days) do
+      local r_line_idx = #lines + 1
+      local r_line_buf = ""
+      local cell_byte_spans = {}
+
+      for col_i, cell_text in ipairs(current_row_cells) do
+        local b_start = #r_line_buf
+        r_line_buf = r_line_buf .. cell_text
+        local b_end = #r_line_buf
+        table.insert(cell_byte_spans, { b_start = b_start, b_end = b_end, day = row_days[col_i], col_i = col_i })
+      end
+      add_line(r_line_buf)
+
+      for _, cspan in ipairs(cell_byte_spans) do
+        local day_num = cspan.day
         if day_num then
-          local c_start = #left_indent + (col_i - 1) * col_width
-          local c_end = c_start + col_width
-
           M.day_cell_map[day_num] = {
             line = r_line_idx,
-            col_start = c_start,
-            col_end = c_end,
+            col_start = cspan.b_start,
+            col_end = cspan.b_end,
           }
 
           local is_today = (M.current_year == M.today.year and M.current_month == M.today.month and day_num == M.today.day)
           local is_selected = (day_num == M.selected_day)
           local d_info = converter.date_info(M.current_year, M.current_month, day_num)
 
-          if is_selected and is_today then
-            add_hl("NepaliCalSelected", r_line_idx, c_start + 1, c_end - 1)
-          elseif is_selected then
-            add_hl("NepaliCalSelected", r_line_idx, c_start + 1, c_end - 1)
+          if is_selected then
+            add_hl("NepaliCalSelected", r_line_idx, cspan.b_start, cspan.b_end)
           elseif is_today then
-            add_hl("NepaliCalToday", r_line_idx, c_start + 1, c_end - 1)
+            add_hl("NepaliCalToday", r_line_idx, cspan.b_start, cspan.b_end)
           elseif d_info.is_holiday then
-            add_hl("NepaliCalHoliday", r_line_idx, c_start + 1, c_end - 1)
-          elseif col_i == 7 then
-            add_hl("NepaliCalSaturday", r_line_idx, c_start + 1, c_end - 1)
+            add_hl("NepaliCalHoliday", r_line_idx, cspan.b_start, cspan.b_end)
+          elseif cspan.col_i == 7 then
+            add_hl("NepaliCalSaturday", r_line_idx, cspan.b_start, cspan.b_end)
+          else
+            add_hl("NepaliCalDay", r_line_idx, cspan.b_start, cspan.b_end)
           end
         end
       end
 
-      current_row = {}
+      current_row_cells = {}
       row_days = {}
     end
   end
 
   -- Leading blanks
   for _ = 1, offset do
-    table.insert(current_row, string.rep(" ", col_width))
+    table.insert(current_row_cells, string.rep(" ", col_width))
     table.insert(row_days, false)
     cell_idx = cell_idx + 1
   end
@@ -240,7 +249,7 @@ function M.render()
       day_str = string.format("%s%s", day_str, localization.to_superscript(d_info.ad.day))
     end
 
-    table.insert(current_row, center_str(day_str, col_width))
+    table.insert(current_row_cells, center_str(day_str, col_width))
     table.insert(row_days, d)
     cell_idx = cell_idx + 1
 
