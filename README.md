@@ -235,4 +235,4 @@ require("nepali-calendar").setup({
 
 ## 📄 License
 
-MIT License © [Pradhyumna Shrestha](https://github.com/pradhyu)
+GNU General Public License v3.0 (GPL-3.0) Copyleft License © 2026 [Pradhyumna Shrestha](https://github.com/pradhyu)
