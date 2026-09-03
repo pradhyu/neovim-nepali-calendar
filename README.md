@@ -226,6 +226,13 @@ require("nepali-calendar").setup({
 
 ---
 
+## 🙏 Acknowledgments & Data Sources
+
+- **Festivals & Holiday Database**: Special thanks to the [`mac-nepali-calendar`](https://github.com/pradhyu/mac-nepali-calendar) open-source project from which the comprehensive Nepali festival, tithi, and public holiday gazette dataset ([`festivals.tsv`](https://raw.githubusercontent.com/pradhyu/mac-nepali-calendar/main/Sources/NepaliCalendar/Resources/festivals.tsv)) is maintained and synchronized.
+- **Panchanga & Astronomical Calculations**: Solar models calibrated for Kathmandu ($27.7172^\circ\text{ N}, 85.3240^\circ\text{ E}$).
+
+---
+
 ## 📄 License
 
 MIT License © [Pradhyumna Shrestha](https://github.com/pradhyu)
