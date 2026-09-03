@@ -71,8 +71,11 @@ local festival_synonyms = {
 
 --- Search all festivals matching query string (supports Nepali, English & Romanized transliterations)
 --- @param query string
+--- @param reference_year integer|nil
+--- @param reference_month integer|nil
+--- @param reference_day integer|nil
 --- @return table[] List of { date_key: string, year: integer, month: integer, day: integer, festival: string, tithi: string, is_holiday: boolean }
-function M.search_events(query)
+function M.search_events(query, reference_year, reference_month, reference_day)
   if not query or query == "" then
     return {}
   end
@@ -118,9 +121,37 @@ function M.search_events(query)
     end
   end
 
-  -- Sort chronologically
+  local cur_y = reference_year or 2083
+  local cur_m = reference_month or 1
+  local cur_d = reference_day or 1
+  local cur_key = string.format("%04d-%02d-%02d", cur_y, cur_m, cur_d)
+
+  -- Sort priority:
+  -- Priority 1: Current calendar year (starting from current date onwards)
+  -- Priority 2: Earlier in current calendar year
+  -- Priority 3: Future years (> current year)
+  -- Priority 4: Past years (< current year)
   table.sort(results, function(a, b)
-    return a.date_key < b.date_key
+    local function get_priority(item)
+      if item.year == cur_y then
+        if item.date_key >= cur_key then
+          return 1, item.date_key
+        else
+          return 2, item.date_key
+        end
+      elseif item.year > cur_y then
+        return 3, item.date_key
+      else
+        return 4, item.date_key
+      end
+    end
+
+    local p1, k1 = get_priority(a)
+    local p2, k2 = get_priority(b)
+    if p1 ~= p2 then
+      return p1 < p2
+    end
+    return k1 < k2
   end)
 
   return results

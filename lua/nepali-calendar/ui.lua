@@ -713,7 +713,7 @@ function M.open_search_dialog()
       return
     end
 
-    local matches = festivals.search_events(query)
+    local matches = festivals.search_events(query, M.current_year, M.current_month, M.selected_day)
     if #matches == 0 then
       vim.notify("No festivals found matching: " .. query, vim.log.levels.WARN, { title = "Festival Search" })
       return
