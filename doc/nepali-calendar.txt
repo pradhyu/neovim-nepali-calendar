@@ -1,0 +1,118 @@
+*nepali-calendar.txt*  Nepali Calendar & Bikram Sambat Utilities for Neovim
+
+==============================================================================
+CONTENTS                                             *nepali-calendar-contents*
+
+    1. Introduction ................................. |nepali-calendar-intro|
+    2. Installation ................................. |nepali-calendar-install|
+    3. Commands ..................................... |nepali-calendar-commands|
+    4. Keybindings .................................. |nepali-calendar-keymaps|
+    5. Lua API & Statusline ......................... |nepali-calendar-api|
+    6. Configuration ................................ |nepali-calendar-config|
+
+==============================================================================
+1. INTRODUCTION                                       *nepali-calendar-intro*
+
+nepali-calendar.nvim is a fast, native Lua plugin for Neovim that brings a
+comprehensive Nepali (Bikram Sambat / BS) Calendar popup window to your editor.
+
+Features:
+- Bikram Sambat calendar lookup from 1975 to 2100 BS
+- 3,200+ Festival & Tithi lookup with government holiday detection
+- Kathmandu Panchanga calculations (Sunrise, Sunset, Day Length, Sun Rashi, Rahu Kaal)
+- Live Nepal Time (NPT UTC+5:45) with Nepal office hours indicator
+- Long weekend streak detector
+- Interactive AD <-> BS date converter, age calculator & date math
+- Statusline component helper for lualine or statusline
+- Easy clipboard copying of Devanagari, English, and ISO date formats
+
+==============================================================================
+2. INSTALLATION                                     *nepali-calendar-install*
+
+Using lazy.nvim: >lua
+    {
+      "neovim-nepali-calendar", -- or path / url
+      keys = {
+        { "<leader>nc", "<cmd>NepaliCalendarToggle<cr>", desc = "Nepali Calendar" },
+      },
+      opts = {
+        language = "nepali", -- "nepali" or "english"
+        border = "rounded",
+        show_panchanga = true,
+        show_nepal_clock = true,
+        show_ad_date = true,
+        show_long_weekends = true,
+      },
+    }
+<
+
+==============================================================================
+3. COMMANDS                                         *nepali-calendar-commands*
+
+:NepaliCalendar             Open the calendar popup window.
+:NepaliCalendarToggle       Toggle the calendar popup window.
+:NepaliCalendarToday        Show today's Nepali date via notification.
+:NepaliCalendarConvert      Open interactive AD <-> BS converter / Age tools.
+
+==============================================================================
+4. KEYBINDINGS                                       *nepali-calendar-keymaps*
+
+Inside the calendar popup:
+    h / [ / <Left>          Previous Month
+    l / ] / <Right>         Next Month
+    { / H                   Previous Year (-1)
+    } / L                   Next Year (+1)
+    j / <Down>              Next Day (+1)
+    k / <Up>                Previous Day (-1)
+    t                       Jump to Today
+    <Tab>                   Toggle Language (नेपाली / English)
+    y                       Copy Full Nepali Date String to Clipboard
+    yi                      Copy ISO Date (YYYY-MM-DD) to Clipboard
+    c                       Open Date Converter / Age / Date Math Menu
+    ?                       Show Help Popup
+    q / <Esc>               Close Calendar Popup
+
+==============================================================================
+5. LUA API & STATUSLINE                                  *nepali-calendar-api*
+
+Statusline Integration (e.g., lualine.nvim): >lua
+    sections = {
+      lualine_x = {
+        {
+          function()
+            return require("nepali-calendar").statusline({ format = "short", lang = "nepali" })
+          end,
+        },
+      },
+    }
+<
+
+API Functions: >lua
+    local nc = require("nepali-calendar")
+
+    nc.open()
+    nc.toggle()
+    nc.close()
+
+    local today = nc.today() -- returns table { year, month, day, festival, tithi, is_holiday, ... }
+    local bs_date = nc.ad_to_bs(2026, 9, 2)
+    local ad_date = nc.bs_to_ad(2083, 5, 17)
+    local age = nc.calculate_age({ year = 2055, month = 1, day = 1 })
+<
+
+==============================================================================
+6. CONFIGURATION                                      *nepali-calendar-config*
+
+Default configuration options: >lua
+    require("nepali-calendar").setup({
+      language = "nepali",        -- "nepali" or "english"
+      border = "rounded",         -- "rounded", "single", "double", "solid", "shadow"
+      show_panchanga = true,      -- Kathmandu Panchanga (Sunrise, Sunset, Rahu Kaal)
+      show_nepal_clock = true,    -- Live Nepal Time & Office status header
+      show_ad_date = true,        -- Gregorian span in header
+      show_long_weekends = true,  -- Highlight upcoming consecutive holidays
+      show_month_progress = true, -- Visual month progress bar
+    })
+<
+
+vim:tw=78:ts=8:ft=help:norl:
