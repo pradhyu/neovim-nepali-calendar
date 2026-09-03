@@ -246,7 +246,7 @@ function M.render()
     end
 
     if config.options.show_english_subscript and d_info.ad then
-      day_str = string.format("%s · %d", day_str, d_info.ad.day)
+      day_str = string.format("%s (%d)", day_str, d_info.ad.day)
     end
 
     table.insert(current_row_cells, center_str(day_str, col_width))
