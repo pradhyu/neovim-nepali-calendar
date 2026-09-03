@@ -331,11 +331,14 @@ function M.change_month(delta)
     y = y - 1
   end
 
-  if y < converter.min_year and y < 1975 then
-    y = 1975
+  local min_y = converter.min_year or 1975
+  local max_y = converter.max_year or 2100
+
+  if y < min_y then
+    y = min_y
     m = 1
-  elseif y > converter.max_year and y > 2100 then
-    y = 2100
+  elseif y > max_y then
+    y = max_y
     m = 12
   end
 
@@ -350,7 +353,9 @@ end
 
 --- Move year by delta (+1 or -1)
 function M.change_year(delta)
-  local y = math.max(1975, math.min(2100, M.current_year + delta))
+  local min_y = converter.min_year or 1975
+  local max_y = converter.max_year or 2100
+  local y = math.max(min_y, math.min(max_y, M.current_year + delta))
   M.current_year = y
   local max_days = converter.days_in_month(y, M.current_month)
   if M.selected_day > max_days then

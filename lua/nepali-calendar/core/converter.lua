@@ -4,6 +4,9 @@ local festivals = require("nepali-calendar.core.festivals")
 
 local M = {}
 
+M.min_year = calendar_data.min_year
+M.max_year = calendar_data.max_year
+
 --- Compute days in a BS month
 --- @param year integer
 --- @param month integer
