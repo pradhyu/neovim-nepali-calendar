@@ -25,10 +25,11 @@ Designed following the specifications of macOS Nepali Calendar: supporting 1975�
 
 ```lua
 {
-  "pkshrestha/neovim-nepali-calendar", -- or local directory
+  "pradhyu/neovim-nepali-calendar",
   cmd = { "NepaliCalendar", "NepaliCalendarToggle", "NepaliCalendarToday", "NepaliCalendarConvert" },
   keys = {
     { "<leader>nc", "<cmd>NepaliCalendarToggle<cr>", desc = "Nepali Calendar (नेपाली पात्रो)" },
+    { "<leader>nt", "<cmd>NepaliCalendarToday<cr>", desc = "Today's Nepali Date" },
   },
   opts = {
     language = "nepali", -- "nepali" or "english"
@@ -36,7 +37,8 @@ Designed following the specifications of macOS Nepali Calendar: supporting 1975�
     show_panchanga = true,
     show_nepal_clock = true,
     show_ad_date = true,
-    show_long_weekends = true,
+    show_long_weekends = false,
+    show_month_progress = false,
   },
 }
 ```

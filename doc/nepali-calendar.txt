@@ -31,9 +31,10 @@ Features:
 
 Using lazy.nvim: >lua
     {
-      "neovim-nepali-calendar", -- or path / url
+      "pradhyu/neovim-nepali-calendar",
       keys = {
         { "<leader>nc", "<cmd>NepaliCalendarToggle<cr>", desc = "Nepali Calendar" },
+        { "<leader>nt", "<cmd>NepaliCalendarToday<cr>", desc = "Today's Nepali Date" },
       },
       opts = {
         language = "nepali", -- "nepali" or "english"
@@ -41,7 +42,8 @@ Using lazy.nvim: >lua
         show_panchanga = true,
         show_nepal_clock = true,
         show_ad_date = true,
-        show_long_weekends = true,
+        show_long_weekends = false,
+        show_month_progress = false,
       },
     }
 <
