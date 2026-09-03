@@ -318,9 +318,13 @@ function M.render()
       if (day_ev.festival and day_ev.festival ~= "") or day_ev.is_holiday or (day_ev.tithi and day_ev.tithi ~= "") then
         local d_label = (lang == "nepali") and localization.to_devanagari(day_i) or tostring(day_i)
         local w_label = (lang == "nepali") and localization.days_nepali_short[day_ev.wday] or localization.days_english_short[day_ev.wday]
-        local hol_tag = day_ev.is_holiday and " [सार्वजनिक बिदा / Holiday]" or ""
-        local tithi_tag = (day_ev.tithi and day_ev.tithi ~= "") and (" (" .. day_ev.tithi .. ")") or ""
-        local fest_tag = (day_ev.festival and day_ev.festival ~= "") and (" - " .. day_ev.festival) or ""
+        local hol_tag = day_ev.is_holiday and ((lang == "nepali") and " [सार्वजनिक बिदा]" or " [Public Holiday]") or ""
+
+        local tithi_text = (lang == "nepali") and day_ev.tithi or localization.translate_tithi(day_ev.tithi)
+        local tithi_tag = (tithi_text and tithi_text ~= "") and (" (" .. tithi_text .. ")") or ""
+
+        local fest_text = (lang == "nepali") and day_ev.festival or localization.translate_festival(day_ev.festival)
+        local fest_tag = (fest_text and fest_text ~= "") and (" - " .. fest_text) or ""
 
         local ev_line = string.format("   • %s %s%s%s%s", d_label, w_label, tithi_tag, fest_tag, hol_tag)
         add_line(ev_line)
@@ -338,7 +342,7 @@ function M.render()
     local sel_info = converter.date_info(M.current_year, M.current_month, M.selected_day)
     local full_date_str = format.format_full(sel_info, lang)
     if sel_info.is_holiday then
-      full_date_str = full_date_str .. "  [सार्वजनिक बिदा / Holiday]"
+      full_date_str = full_date_str .. ((lang == "nepali") and "  [सार्वजनिक बिदा / Holiday]" or "  [Public Holiday]")
     end
     add_line(" 🇳🇵 " .. full_date_str)
     add_hl("NepaliCalHeader", #lines, 0, -1)
@@ -351,7 +355,8 @@ function M.render()
     end
 
     if sel_info.festival and sel_info.festival ~= "" then
-      add_line(" ✨ " .. sel_info.festival)
+      local fest_display = (lang == "nepali") and sel_info.festival or localization.translate_festival(sel_info.festival)
+      add_line(" ✨ " .. fest_display)
       add_hl("NepaliCalFestival", #lines, 0, -1)
     end
 
@@ -362,7 +367,9 @@ function M.render()
       add_line(pan_line1)
       add_hl("NepaliCalPanchanga", #lines, 0, -1)
 
-      local pan_line2 = string.format(" ☀️ राशि: %s   ⏱ राहु काल: %s", pan.sun_rashi, pan.rahu_kaal)
+      local rashi_label = (lang == "nepali") and "☀️ राशि:" or "☀️ Sun Sign:"
+      local rahu_label = (lang == "nepali") and "⏱ राहु काल:" or "⏱ Rahu Kaal:"
+      local pan_line2 = string.format(" %s %s   %s %s", rashi_label, pan.sun_rashi, rahu_label, pan.rahu_kaal)
       add_line(pan_line2)
       add_hl("NepaliCalPanchanga", #lines, 0, -1)
     end
