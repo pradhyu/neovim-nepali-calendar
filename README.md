@@ -105,7 +105,8 @@ Plug 'pradhyu/neovim-nepali-calendar'
 | `L` / `}` | Next Year (+1) |
 | `j` / `<Down>` | Next Day (+1) |
 | `k` / `<Up>` | Previous Day (-1) |
-| `v` / `V` | **Visual Range Mode** (Highlight multiple days & display all events in range) |
+| `v` | **Visual Mode** (Highlight custom range with `h/l/j/k`) |
+| `V` / `<S-v>` | **Visual Line Mode** (Highlight **entire current week** Sunday–Saturday) |
 | `t` | Jump to Today |
 | `/` / `s` | **Search Festivals & Events (3,200+)** |
 | `<Tab>` | Toggle Language (`नेपाली` ↔ `English`) |

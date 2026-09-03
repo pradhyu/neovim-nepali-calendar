@@ -450,7 +450,7 @@ function M.change_year(delta)
   M.render()
 end
 
---- Toggle visual range selection mode
+--- Toggle visual range selection mode (v)
 function M.toggle_visual_mode()
   if M.visual_range_start then
     -- Exit visual mode
@@ -463,6 +463,26 @@ function M.toggle_visual_mode()
     M.visual_range_end = M.selected_day
     vim.notify("Entered Visual Mode: use h/l/j/k to select day range (press v or Esc to exit)", vim.log.levels.INFO, { title = "Nepali Calendar" })
   end
+  M.render()
+end
+
+--- Select entire current week (V / Shift-V)
+function M.select_whole_week()
+  local sel_info = converter.date_info(M.current_year, M.current_month, M.selected_day)
+  local max_days = converter.days_in_month(M.current_year, M.current_month)
+
+  -- wday: 1 = Sunday, 2 = Monday, ..., 7 = Saturday
+  local days_to_sunday = sel_info.wday - 1
+  local days_to_saturday = 7 - sel_info.wday
+
+  local week_start = math.max(1, M.selected_day - days_to_sunday)
+  local week_end = math.min(max_days, M.selected_day + days_to_saturday)
+
+  M.visual_range_start = week_start
+  M.visual_range_end = week_end
+  M.selected_day = week_end
+
+  vim.notify(string.format("Selected Week (%d to %d)", week_start, week_end), vim.log.levels.INFO, { title = "Nepali Calendar" })
   M.render()
 end
 
@@ -725,6 +745,7 @@ Nepali Calendar (नेपाली पात्रो) Shortcuts:
   j / Down          : Next Day (+1)
   k / Up            : Previous Day (-1)
   v                 : Toggle Visual Selection Range (Show all events)
+  V (Shift-V)       : Select Entire Week (Sun–Sat) & Show Events
   t                 : Jump to Today
   / / s             : Search Festivals & Events (3200+)
   <Tab>             : Toggle Nepali / English
@@ -806,6 +827,7 @@ function M.open()
     end
   end)
   map(km.visual_mode, M.toggle_visual_mode)
+  map(km.visual_line, M.select_whole_week)
   map(km.next_month, function()
     M.change_month(1)
   end)
