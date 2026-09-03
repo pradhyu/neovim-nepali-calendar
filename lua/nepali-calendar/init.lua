@@ -10,6 +10,15 @@ local M = {}
 --- @param opts table|nil
 function M.setup(opts)
   config.setup(opts)
+  local updater = require("nepali-calendar.core.updater")
+  updater.load_cached_events()
+  -- Check and fetch updates asynchronously in background without blocking Neovim
+  updater.check_and_update(false)
+end
+
+--- Manually update events from remote repository
+function M.update_events(callback)
+  require("nepali-calendar.core.updater").check_and_update(true, callback)
 end
 
 --- Open or toggle the floating Nepali Calendar popup

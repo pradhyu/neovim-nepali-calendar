@@ -777,6 +777,7 @@ Nepali Calendar (नेपाली पात्रो) Shortcuts:
   v                 : Toggle Visual Selection Range (Show all events)
   V (Shift-V)       : Select Entire Week (Sun–Sat) & Show Events
   t                 : Jump to Today
+  u                 : Update Festivals & Events (Fetch latest)
   / / s             : Search Festivals & Events (3200+)
   <Tab>             : Toggle Nepali / English
   y                 : Copy Selected Date / Range
@@ -880,6 +881,13 @@ function M.open()
   map(km.toggle_lang, M.toggle_language)
   map(km.copy_date, M.copy_selected_date)
   map(km.copy_iso, M.copy_iso_date)
+  map(km.update_events, function()
+    require("nepali-calendar").update_events(function(ok, count)
+      if ok then
+        M.render()
+      end
+    end)
+  end)
   map(km.search, M.open_search_dialog)
   map(km.converter, M.open_converter_dialog)
   map(km.help, M.show_help)

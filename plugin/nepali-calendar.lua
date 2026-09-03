@@ -25,3 +25,7 @@ end, { desc = "Open Nepali Date Converter / Age / Math tools" })
 vim.api.nvim_create_user_command("NepaliCalendarSearch", function()
   require("nepali-calendar.ui").open_search_dialog()
 end, { desc = "Search Nepali Festivals & Events" })
+
+vim.api.nvim_create_user_command("NepaliCalendarUpdate", function()
+  require("nepali-calendar").update_events()
+end, { desc = "Fetch and update latest Nepali festivals & events from remote" })

@@ -108,6 +108,7 @@ Plug 'pradhyu/neovim-nepali-calendar'
 | `v` | **Visual Mode** (Highlight custom range with `h/l/j/k`) |
 | `V` / `<S-v>` | **Visual Line Mode** (Highlight **entire current week** Sunday–Saturday) |
 | `t` | Jump to Today |
+| `u` | **Update Events** (Fetch latest festivals/holidays from remote) |
 | `/` / `s` | **Search Festivals & Events (3,200+)** |
 | `<Tab>` | Toggle Language (`नेपाली` ↔ `English`) |
 | `y` | Copy Selected Date or Range to clipboard |
@@ -124,6 +125,7 @@ Plug 'pradhyu/neovim-nepali-calendar'
 - `:NepaliCalendarToggle` — Toggle popup open / close.
 - `:NepaliCalendarToday` — Show today's Nepali date via notification.
 - `:NepaliCalendarSearch` — Search Nepali festivals & events (3,200+ entries) and jump to date.
+- `:NepaliCalendarUpdate` — Fetch and update latest Nepali festivals & holidays from remote repository.
 - `:NepaliCalendarConvert` — Open interactive date conversion & age calculation dialog.
 
 ---
